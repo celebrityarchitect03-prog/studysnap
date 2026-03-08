@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudySnap - Smart Study Helper</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+    }
+
+    .btn-primary {
+      background-color: #3b82f6;
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #2563eb;
+      transform: scale(1.05);
+    }
+
+    .btn-secondary {
+      background-color: #10b981;
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-secondary:hover {
+      background-color: #059669;
+    }
+
+    .btn-outline {
+      border: 2px solid #3b82f6;
+      color: #3b82f6;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .btn-outline:hover {
+      background-color: #eff6ff;
+    }
+
+    .card {
+      background: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      transition: all 0.3s;
+    }
+
+    .card:hover {
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .nav-item {
+      cursor: pointer;
+      color: #374151;
+      font-weight: 600;
+      transition: all 0.2s;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+
+    .nav-item:hover {
+      color: #3b82f6;
+    }
+
+    .nav-item.active {
+      color: #3b82f6;
+    }
+
+    .nav-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 0.25rem;
+      background: #3b82f6;
+      border-radius: 2px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .quiz-option {
+      border: 2px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quiz-option:hover {
+      border-color: #93c5fd;
+      background-color: #eff6ff;
+    }
+
+    .quiz-option.selected {
+      border-color: #3b82f6;
+      background-color: #dbeafe;
+    }
+
+    .flashcard {
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+      color: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      padding: 2rem;
+      min-height: 16rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transform: perspective(1000px);
+      transition: all 0.3s;
+    }
+
+    .flashcard:hover {
+      transform: scale(1.05);
+    }
+
+    .flashcard.flipped {
+      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    }
+
+    .schedule-item {
+      border-left: 4px solid #3b82f6;
+      padding-left: 1rem;
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-radius: 0 0.25rem 0.25rem 0;
+      transition: all 0.2s;
+    }
+
+    .schedule-item:hover {
+      background-color: #eff6ff;
+    }
+
+    .group-card {
+      border: 2px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .group-card:hover {
+      border-color: #10b981;
+      background-color: #f0fdf4;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-white to-green-50">
+  <div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">📸</div>
+          <h1 class="text-2xl font-bold text-gray-800">StudySnap</h1>
+        </div>
+        <p class="text-sm text-gray-600">Smart Study Helper for Students</p>
+      </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200 sticky top-16 z-40">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex gap-8 overflow-x-auto py-4">
+          <button class="nav-item active" data-section="home">📚 Home</button>
+          <button class="nav-item" data-section="snap">📸 Snap & Explain</button>
+          <button class="nav-item" data-section="summary">📝 Summary</button>
+          <button class="nav-item" data-section="quiz">❓ Quiz</button>
+          <button class="nav-item" data-section="planner">📅 Planner</button>
+          <button class="nav-item" data-section="groups">👥 Groups</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
+      <!-- Home Section -->
+      <section id="home-section" class="section-content fade-in">
+        <div class="mb-8">
+          <h2 class="text-4xl font-bold text-gray-800 mb-2">Welcome to StudySnap! 🎓</h2>
+          <p class="text-gray-600 text-lg">Your personal AI-powered study companion</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <div class="card cursor-pointer hover:scale-105" onclick="navigateTo('snap')">
+            <div class="text-4xl mb-3">📸</div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Snap & Explain</h3>
+            <p class="text-gray-600">Take a photo of your notes and get instant explanations</p>
+          </div>
+
+          <div class="card cursor-pointer hover:scale-105" onclick="navigateTo('summary')">
+            <div class="text-4xl mb-3">📝</div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Quick Summary</h3>
+            <p class="text-gray-600">Convert long text into quick bullet-point summaries</p>
+          </div>
+
+          <div class="card cursor-pointer hover:scale-105" onclick="navigateTo('quiz')">
+            <div class="text-4xl mb-3">❓</div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Quiz Generator</h3>
+            <p class="text-gray-600">Create practice quizzes and flashcards instantly</p>
+          </div>
+
+          <div class="card cursor-pointer hover:scale-105" onclick="navigateTo('planner')">
+            <div class="text-4xl mb-3">📅</div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Study Planner</h3>
+            <p class="text-gray-600">Plan your study sessions and get exam reminders</p>
+          </div>
+
+          <div class="card cursor-pointer hover:scale-105" onclick="navigateTo('groups')">
+            <div class="text-4xl mb-3">👥</div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Group Study</h3>
+            <p class="text-gray-600">Collaborate with classmates and share notes</p>
+          </div>
+
+          <div class="card cursor-pointer hover:scale-105">
+            <div class="text-4xl mb-3">🔊</div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Voice Explanation</h3>
+            <p class="text-gray-600">Listen to AI-generated audio lessons</p>
+          </div>
+        </div>
+
+        <div class="mt-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-xl p-8 text-white">
+          <h3 class="text-2xl font-bold mb-4">Quick Tips for Better Learning 💡</h3>
+          <ul class="space-y-2">
+            <li>✓ Use Snap & Explain for complex topics</li>
+            <li>✓ Generate summaries for quick revision</li>
+            <li>✓ Practice with quizzes before exams</li>
+            <li>✓ Plan your study schedule ahead</li>
+            <li>✓ Study together with friends in groups</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Snap & Explain Section -->
+      <section id="snap-section" class="section-content hidden fade-in">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">📸 Snap & Explain</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="card">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Upload or Capture</h3>
+            
+            <div id="upload-area" class="border-2 border-dashed border-blue-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all mb-4">
+              <div class="text-4xl mb-2">📷</div>
+              <p class="text-gray-700 font-semibold mb-2">Tap to take a photo or click to upload</p>
+              <input type="file" id="snap-input" accept="image/*" class="hidden" onchange="handleSnapUpload(event)">
+            </div>
+
+            <div id="snap-preview" class="hidden">
+              <img id="snap-image" src="" alt="Preview" class="w-full h-64 object-cover rounded-lg mb-4">
+              <button class="w-full btn-primary mb-2" onclick="explainSnap()">Explain This 🚀</button>
+              <button class="w-full btn-outline" onclick="resetSnap()">Try Another</button>
+            </div>
+
+            <div id="snap-loading" class="hidden text-center py-4">
+              <p class="text-gray-600">Analyzing your image...</p>
+              <div class="mt-2 flex justify-center">
+                <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">AI Explanation</h3>
+            
+            <div id="snap-explanation-area" class="bg-gray-50 rounded-lg p-4 min-h-64 max-h-96 overflow-y-auto">
+              <p class="text-gray-500 text-center py-8">Upload an image to get started</p>
+            </div>
+
+            <div id="snap-actions" class="hidden mt-4 flex gap-2">
+              <button class="flex-1 btn-secondary" onclick="playExplanation()">🔊 Listen</button>
+              <button class="flex-1 btn-outline" onclick="copyText('snap-explanation-area')">📋 Copy</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Summary Section -->
+      <section id="summary-section" class="section-content hidden fade-in">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">📝 Quick Summary</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="card">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Enter Your Text</h3>
+            <textarea id="summary-input" class="input-field h-64" style="resize: none;" placeholder="Paste your notes, textbook text, or assignment here..."></textarea>
+            <button class="w-full btn-primary mt-4" onclick="generateSummary()">Generate Summary 🎯</button>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Summary Bullet Points</h3>
+            <div id="summary-output" class="bg-gray-50 rounded-lg p-4 min-h-64 max-h-96 overflow-y-auto">
+              <p class="text-gray-500">Your summary will appear here</p>
+            </div>
+            <div id="summary-actions" class="hidden mt-4 flex gap-2">
+              <button class="flex-1 btn-secondary" onclick="playSummary()">🔊 Listen</button>
+              <button class="flex-1 btn-outline" onclick="copyText('summary-output')">📋 Copy</button>
+              <button class="flex-1 btn-outline" onclick="downloadText('summary-output', 'study-summary.txt')">⬇️ Download</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quiz Section -->
+      <section id="quiz-section" class="section-content hidden fade-in">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">❓ Quiz Generator</h2>
+        
+        <div class="mb-6 flex gap-4">
+          <button class="btn-primary" onclick="startQuiz('generate')">Generate New Quiz</button>
+          <button class="btn-secondary" onclick="startQuiz('flashcard')">Create Flashcards</button>
+        </div>
+
+        <div id="quiz-input-area" class="card mb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">What do you want to quiz on?</h3>
+          <textarea id="quiz-content" class="input-field h-32" style="resize: none;" placeholder="Paste your study material here..."></textarea>
+          <div class="mt-4 flex gap-2">
+            <button class="flex-1 btn-primary" onclick="generateQuiz()">Generate Quiz</button>
+            <button class="flex-1 btn-outline" onclick="generateFlashcards()">Generate Flashcards</button>
+          </div>
+        </div>
+
+        <div id="quiz-display" class="hidden">
+          <div class="card">
+            <div class="flex justify-between items-center mb-6">
+              <h3 id="quiz-title" class="text-xl font-bold text-gray-800">Quiz Time!</h3>
+              <span id="quiz-progress" class="text-gray-600">Question 1 of 5</span>
+            </div>
+
+            <div class="mb-6 w-full bg-gray-200 rounded-full h-2">
+              <div id="quiz-progress-bar" class="bg-blue-500 h-2 rounded-full" style="width: 20%"></div>
+            </div>
+
+            <p id="quiz-question" class="text-lg font-semibold text-gray-800 mb-6"></p>
+
+            <div id="quiz-options" class="space-y-3 mb-6"></div>
+
+            <div class="flex gap-3">
+              <button id="quiz-prev-btn" class="flex-1 btn-outline hidden" onclick="previousQuestion()">← Previous</button>
+              <button id="quiz-next-btn" class="flex-1 btn-primary" onclick="nextQuestion()">Next →</button>
+              <button id="quiz-submit-btn" class="flex-1 btn-primary hidden" onclick="submitQuiz()">Submit Quiz</button>
+            </div>
+          </div>
+
+          <div id="quiz-results" class="hidden mt-6 card">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Your Results 🎉</h3>
+            <div class="text-center mb-6">
+              <div class="text-6xl font-bold text-blue-500 mb-2" id="score-text">0%</div>
+              <p class="text-gray-600" id="score-description">Great effort!</p>
+            </div>
+            <button class="w-full btn-primary mb-2" onclick="retakeQuiz()">Retake Quiz</button>
+            <button class="w-full btn-outline" onclick="backToQuiz()">Back to Input</button>
+          </div>
+        </div>
+
+        <div id="flashcard-display" class="hidden">
+          <div class="mb-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 id="flashcard-title" class="text-xl font-bold text-gray-800">Flashcards</h3>
+              <span id="flashcard-progress" class="text-gray-600">Card 1 of 5</span>
+            </div>
+
+            <div class="flashcard" id="flashcard" onclick="flipFlashcard()">
+              <div class="text-center">
+                <p id="flashcard-content" class="text-2xl font-bold text-center"></p>
+                <p class="text-sm mt-4 opacity-75">Click to reveal answer</p>
+              </div>
+            </div>
+
+            <div class="mt-6 flex gap-3">
+              <button class="flex-1 btn-outline" onclick="previousFlashcard()">← Previous</button>
+              <button class="flex-1 btn-secondary" onclick="nextFlashcard()">Next →</button>
+            </div>
+
+            <div class="mt-4 flex gap-2">
+              <button class="flex-1 btn-primary" onclick="shuffleFlashcards()">🔀 Shuffle</button>
+              <button class="flex-1 btn-outline" onclick="backToQuiz()">Back</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Planner Section -->
+      <section id="planner-section" class="section-content hidden fade-in">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">📅 Study Planner</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="card lg:col-span-1">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Schedule New Event</h3>
+            
+            <input type="text" id="event-title" class="input-field mb-3" placeholder="Study topic or exam name">
+            <input type="date" id="event-date" class="input-field mb-3">
+            <input type="time" id="event-time" class="input-field mb-3">
+            
+            <select id="event-type" class="input-field mb-3">
+              <option value="study">📚 Study Session</option>
+              <option value="exam">📝 Exam</option>
+              <option value="assignment">✏️ Assignment Due</option>
+              <option value="quiz">❓ Quiz</option>
+            </select>
+
+            <button class="w-full btn-primary mb-2" onclick="addPlannerEvent()">Add Event</button>
+            <button class="w-full btn-outline" onclick="setPlannerReminders()">🔔 Set Reminders</button>
+          </div>
+
+          <div class="lg:col-span-2">
+            <div class="card mb-6">
+              <h3 class="text-lg font-bold text-gray-800 mb-4">Today's Schedule</h3>
+              <div id="today-schedule" class="space-y-3">
+                <p class="text-gray-500">No events scheduled for today</p>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="text-lg font-bold text-gray-800 mb-4">Upcoming Events</h3>
+              <div id="upcoming-schedule" class="space-y-3">
+                <p class="text-gray-500">No upcoming events</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Groups Section -->
+      <section id="groups-section" class="section-content hidden fade-in">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">👥 Group Study</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="card">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Study Groups</h3>
+            
+            <div class="space-y-3 mb-4">
+              <input type="text" id="group-name" class="input-field" placeholder="Group name">
+              <input type="text" id="group-subject" class="input-field" placeholder="Subject">
+              <textarea id="group-description" class="input-field h-20" style="resize: none;" placeholder="Group description"></textarea>
+              <button class="w-full btn-primary" onclick="createStudyGroup()">Create Group</button>
+            </div>
+
+            <div class="border-t pt-4">
+              <h4 class="font-bold text-gray-800 mb-3">Join Existing Groups</h4>
+              <input type="text" id="group-code" class="input-field mb-2" placeholder="Enter group code">
+              <button class="w-full btn-secondary" onclick="joinStudyGroup()">Join Group</button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2">
+            <div id="groups-list" class="space-y-4">
+              <p class="text-gray-500">No groups yet. Create or join one to get started!</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="group-detail" class="hidden mt-6">
+          <div class="card">
+            <h3 id="group-detail-name" class="text-xl font-bold text-gray-800 mb-4">Group Study - Mathematics</h3>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div class="lg:col-span-2">
+                <h4 class="font-bold text-gray-800 mb-3">Shared Notes</h4>
+                <div id="shared-notes" class="bg-gray-50 rounded-lg p-4 min-h-64 max-h-96 overflow-y-auto space-y-3">
+                  <p class="text-gray-500">No shared notes yet</p>
+                </div>
+                
+                <div class="mt-4">
+                  <textarea id="group-note-input" class="input-field h-20" style="resize: none;" placeholder="Share a note with the group..."></textarea>
+                  <button class="w-full btn-primary mt-2" onclick="shareGroupNote()">Share Note 📤</button>
+                </div>
+              </div>
+
+              <div>
+                <h4 class="font-bold text-gray-800 mb-3">Members</h4>
+                <div id="group-members" class="bg-gray-50 rounded-lg p-4 space-y-2">
+                  <p class="text-gray-600 text-sm">You (Owner)</p>
+                </div>
+
+                <button class="w-full btn-outline mt-4 text-sm" onclick="inviteGroupMembers()">📧 Invite Friends</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+      <div class="max-w-7xl mx-auto px-4 py-8 text-center text-gray-600">
+        <p>© 2025 StudySnap. Making study smarter, faster, and more fun. 🚀</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const appState = {
+      currentSection: 'home',
+      snapImage: null,
+      snapExplanation: '',
+      quizQuestions: [],
+      currentQuizQuestion: 0,
+      quizAnswers: [],
+      flashcards: [],
+      currentFlashcard: 0,
+      flashcardFlipped: false,
+      plannerEvents: [],
+      studyGroups: [],
+      currentGroupId: null,
+    };
+
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const section = e.target.dataset.section;
+        navigateTo(section);
+      });
+    });
+
+    function navigateTo(section) {
+      document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+      
+      const sectionEl = document.getElementById(`${section}-section`);
+      if (sectionEl) sectionEl.classList.remove('hidden');
+      
+      const navBtn = document.querySelector(`[data-section="${section}"]`);
+      if (navBtn) navBtn.classList.add('active');
+      
+      appState.currentSection = section;
+    }
+
+    // Snap & Explain
+    document.getElementById('upload-area')?.addEventListener('click', () => {
+      document.getElementById('snap-input').click();
+    });
+
+    document.getElementById('upload-area')?.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.currentTarget.classList.add('border-blue-500', 'bg-blue-50');
+    });
+
+    document.getElementById('upload-area')?.addEventListener('dragleave', (e) => {
+      e.currentTarget.classList.remove('border-blue-500', 'bg-blue-50');
+    });
+
+    document.getElementById('upload-area')?.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.currentTarget.classList.remove('border-blue-500', 'bg-blue-50');
+      if (e.dataTransfer.files[0]) {
+        document.getElementById('snap-input').files = e.dataTransfer.files;
+        handleSnapUpload();
+      }
+    });
+
+    function handleSnapUpload(event) {
+      const file = event?.target?.files?.[0] || document.getElementById('snap-input').files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        appState.snapImage = e.target.result;
+        document.getElementById('snap-image').src = e.target.result;
+        document.getElementById('snap-preview').classList.remove('hidden');
+        document.getElementById('upload-area').classList.add('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function explainSnap() {
+      document.getElementById('snap-loading').classList.remove('hidden');
+      document.getElementById('snap-explanation-area').innerHTML = '';
+
+      setTimeout(() => {
+        const explanations = [
+          `<h4 class="font-bold text-lg text-blue-700 mb-3">Key Concepts Explained:</h4>
+           <ul class="space-y-2 text-gray-700">
+             <li><strong>• Definition:</strong> This concept refers to the fundamental principle of...</li>
+             <li><strong>• How it works:</strong> The process involves several interconnected steps that...</li>
+             <li><strong>• Real-world example:</strong> In everyday life, you can see this when...</li>
+             <li><strong>• Why it matters:</strong> Understanding this helps you grasp the broader...</li>
+             <li><strong>• Common mistakes:</strong> Students often confuse this with... Remember instead...</li>
+           </ul>
+           <h4 class="font-bold text-lg text-blue-700 mt-4 mb-2">Quick Summary:</h4>
+           <p class="text-gray-700">This concept is essential for understanding advanced topics.</p>`,
+          
+          `<h4 class="font-bold text-lg text-green-700 mb-3">Breaking It Down:</h4>
+           <p class="text-gray-700 mb-3">This diagram shows the relationship between different variables:</p>
+           <ul class="space-y-2 text-gray-700">
+             <li><strong>• Component A:</strong> Represents the initial state</li>
+             <li><strong>• Component B:</strong> Shows the transformation</li>
+             <li><strong>• Component C:</strong> Demonstrates the outcome</li>
+           </ul>`,
+          
+          `<h4 class="font-bold text-lg text-purple-700 mb-3">What You're Looking At:</h4>
+           <p class="text-gray-700 mb-3">This appears to be a timeline showing sequence:</p>
+           <ul class="space-y-2 text-gray-700">
+             <li><strong>• First event:</strong> Was significant because...</li>
+             <li><strong>• Connection:</strong> Led to the next event</li>
+             <li><strong>• Impact:</strong> Changed everything that followed</li>
+           </ul>`
+        ];
+
+        const explanation = explanations[Math.floor(Math.random() * explanations.length)];
+        document.getElementById('snap-explanation-area').innerHTML = explanation;
+        appState.snapExplanation = explanation;
+        
+        document.getElementById('snap-loading').classList.add('hidden');
+        document.getElementById('snap-actions').classList.remove('hidden');
+      }, 1500);
+    }
+
+    function resetSnap() {
+      appState.snapImage = null;
+      document.getElementById('snap-preview').classList.add('hidden');
+      document.getElementById('snap-actions').classList.add('hidden');
+      document.getElementById('upload-area').classList.remove('hidden');
+      document.getElementById('snap-explanation-area').innerHTML = '<p class="text-gray-500 text-center py-8">Upload an image to get started</p>';
+    }
+
+    function playExplanation() {
+      const text = appState.snapExplanation.replace(/<[^>]*>/g, '');
+      speakText(text);
+    }
+
+    // Summary Feature
+    function generateSummary() {
+      const text = document.getElementById('summary-input').value.trim();
+      if (!text) {
+        alert('Please enter some text first!');
+        return;
+      }
+
+      const loading = document.getElementById('summary-output');
+      loading.innerHTML = '<p class="text-gray-600">Generating summary...</p>';
+
+      setTimeout(() => {
+        const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 20);
+        const bulletPoints = sentences
+          .slice(0, Math.min(5, sentences.length))
+          .map(s => `<li class="py-2 text-gray-700">• ${s.trim()}</li>`)
+          .join('');
+
+        document.getElementById('summary-output').innerHTML = `
+          <ul class="space-y-2">
+            ${bulletPoints || '<li class="py-2 text-gray-700">• Key points from your text</li>'}
+          </ul>
+        `;
+        document.getElementById('summary-actions').classList.remove('hidden');
+      }, 1000);
+    }
+
+    function playSummary() {
+      const text = document.getElementById('summary-output').innerText;
+      speakText(text);
+    }
+
+    function copyText(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard!');
+      });
+    }
+
+    function downloadText(elementId, filename) {
+      const text = document.getElementById(elementId).innerText;
+      const element = document.createElement('a');
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+      element.setAttribute('download', filename);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+
+    // Quiz Generator
+    function generateQuiz() {
+      const content = document.getElementById('quiz-content').value.trim();
+      if (!content) {
+        alert('Please enter study material first!');
+        return;
+      }
+
+      document.getElementById('quiz-input-area').classList.add('hidden');
+      document.getElementById('quiz-display').classList.remove('hidden');
+
+      const questions = generateQuestions(content, 5);
+      appState.quizQuestions = questions;
+      appState.currentQuizQuestion = 0;
+      appState.quizAnswers = new Array(questions.length).fill(null);
+
+      displayQuestion(0);
+    }
+
+    function generateFlashcards() {
+      const content = document.getElementById('quiz-content').value.trim();
+      if (!content) {
+        alert('Please enter study material first!');
+        return;
+      }
+
+      document.getElementById('quiz-input-area').classList.add('hidden');
+      document.getElementById('flashcard-display').classList.remove('hidden');
+
+      appState.flashcards = generateFlashcardPairs(content);
+      appState.currentFlashcard = 0;
+      appState.flashcardFlipped = false;
+
+      displayFlashcard();
+    }
+
+    function generateQuestions(content, count) {
+      const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 20);
+      const questions = [];
+
+      for (let i = 0; i < count && i < sentences.length; i++) {
+        questions.push({
+          question: `What is the main idea of: "${sentences[i].substring(0, 50)}..."?`,
+          options: [
+            sentences[i].substring(0, 40) + '...',
+            'A different concept entirely',
+            'The opposite of what was stated',
+            'A general summary'
+          ].sort(() => Math.random() - 0.5),
+          correct: 0
+        });
+      }
+
+      return questions;
+    }
+
+    function generateFlashcardPairs(content) {
+      const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 20);
+      return sentences.slice(0, 5).map(s => ({
+        question: 'What does this describe?',
+        answer: s.trim()
+      }));
+    }
+
+    function displayQuestion(index) {
+      const question = appState.quizQuestions[index];
+      document.getElementById('quiz-question').textContent = question.question;
+      
+      const optionsHtml = question.options.map((opt, i) => `
+        <div class="quiz-option" onclick="selectOption(${i})">
+          <input type="radio" name="option" value="${i}"> ${opt}
+        </div>
+      `).join('');
+      
+      document.getElementById('quiz-options').innerHTML = optionsHtml;
+      document.getElementById('quiz-progress').textContent = `Question ${index + 1} of ${appState.quizQuestions.length}`;
+      document.getElementById('quiz-progress-bar').style.width = `${((index + 1) / appState.quizQuestions.length) * 100}%`;
+
+      document.getElementById('quiz-prev-btn').classList.toggle('hidden', index === 0);
+      document.getElementById('quiz-next-btn').classList.toggle('hidden', index === appState.quizQuestions.length - 1);
+      document.getElementById('quiz-submit-btn').classList.toggle('hidden', index !== appState.quizQuestions.length - 1);
+    }
+
+    function selectOption(index) {
+      appState.quizAnswers[appState.currentQuizQuestion] = index;
+    }
+
+    function nextQuestion() {
+      if (appState.currentQuizQuestion < appState.quizQuestions.length - 1) {
+        appState.currentQuizQuestion++;
+        displayQuestion(appState.currentQuizQuestion);
+      }
+    }
+
+    function previousQuestion() {
+      if (appState.currentQuizQuestion > 0) {
+        appState.currentQuizQuestion--;
+        displayQuestion(appState.currentQuizQuestion);
+      }
+    }
+
+    function submitQuiz() {
+      const correct = appState.quizAnswers.filter((ans, i) => ans === appState.quizQuestions[i].correct).length;
+      const percentage = (correct / appState.quizQuestions.length) * 100;
+
+      document.getElementById('quiz-display').innerHTML = '';
+      document.getElementById('quiz-results').classList.remove('hidden');
+      document.getElementById('score-text').textContent = `${Math.round(percentage)}%`;
+      document.getElementById('score-description').textContent = 
+        percentage >= 80 ? '🎉 Excellent! You mastered this!' :
+        percentage >= 60 ? '👍 Good effort! Keep studying!' :
+        '💪 Keep practicing! You\'ll improve!';
+    }
+
+    function retakeQuiz() {
+      appState.currentQuizQuestion = 0;
+      appState.quizAnswers = new Array(appState.quizQuestions.length).fill(null);
+      document.getElementById('quiz-results').classList.add('hidden');
+      document.getElementById('quiz-display').classList.remove('hidden');
+      displayQuestion(0);
+    }
+
+    function backToQuiz() {
+      appState.quizQuestions = [];
+      appState.flashcards = [];
+      document.getElementById('quiz-input-area').classList.remove('hidden');
+      document.getElementById('quiz-display').classList.add('hidden');
+      document.getElementById('quiz-results').classList.add('hidden');
+      document.getElementById('flashcard-display').classList.add('hidden');
+      document.getElementById('quiz-content').value = '';
+    }
+
+    function displayFlashcard() {
+      const card = appState.flashcards[appState.currentFlashcard];
+      const content = appState.flashcardFlipped ? card.answer : card.question;
+      document.getElementById('flashcard-content').textContent = content;
+      document.getElementById('flashcard').className = appState.flashcardFlipped ? 'flashcard flipped' : 'flashcard';
+      document.getElementById('flashcard-progress').textContent = `Card ${appState.currentFlashcard + 1} of ${appState.flashcards.length}`;
+    }
+
+    function flipFlashcard() {
+      appState.flashcardFlipped = !appState.flashcardFlipped;
+      displayFlashcard();
+    }
+
+    function nextFlashcard() {
+      if (appState.currentFlashcard < appState.flashcards.length - 1) {
+        appState.currentFlashcard++;
+        appState.flashcardFlipped = false;
+        displayFlashcard();
+      }
+    }
+
+    function previousFlashcard() {
+      if (appState.currentFlashcard > 0) {
+        appState.currentFlashcard--;
+        appState.flashcardFlipped = false;
+        displayFlashcard();
+      }
+    }
+
+    function shuffleFlashcards() {
+      appState.flashcards.sort(() => Math.random() - 0.5);
+      appState.currentFlashcard = 0;
+      appState.flashcardFlipped = false;
+      displayFlashcard();
+    }
+
+    // Study Planner
+    function addPlannerEvent() {
+      const title = document.getElementById('event-title').value.trim();
+      const date = document.getElementById('event-date').value;
+      const time = document.getElementById('event-time').value;
+      const type = document.getElementById('event-type').value;
+
+      if (!title || !date) {
+        alert('Please fill in all required fields!');
+        return;
+      }
+
+      const event = { id: Date.now(), title, date, time, type };
+      appState.plannerEvents.push(event);
+      
+      document.getElementById('event-title').value = '';
+      document.getElementById('event-date').value = '';
+      document.getElementById('event-time').value = '';
+
+      updatePlannerDisplay();
+      alert('Event added successfully! 📅');
+    }
+
+    function updatePlannerDisplay() {
+      const today = new Date().toISOString().split('T')[0];
+      const todayEvents = appState.plannerEvents.filter(e => e.date === today);
+      const upcomingEvents = appState.plannerEvents.filter(e => e.date > today).sort((a, b) => a.date.localeCompare(b.date));
+
+      const typeEmoji = { study: '📚', exam: '📝', assignment: '✏️', quiz: '❓' };
+
+      const todayHtml = todayEvents.length ? 
+        todayEvents.map(e => `
+          <div class="schedule-item">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="font-bold text-gray-800">${typeEmoji[e.type]} ${e.title}</p>
+                <p class="text-sm text-gray-600">${e.time || 'All day'}</p>
+              </div>
+              <button onclick="removePlannerEvent(${e.id})" class="text-red-500 hover:text-red-700">✕</button>
+            </div>
+          </div>
+        `).join('') : '<p class="text-gray-500">No events scheduled for today</p>';
+
+      const upcomingHtml = upcomingEvents.length ?
+        upcomingEvents.map(e => `
+          <div class="schedule-item">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="font-bold text-gray-800">${typeEmoji[e.type]} ${e.title}</p>
+                <p class="text-sm text-gray-600">${e.date} ${e.time ? 'at ' + e.time : 'All day'}</p>
+              </div>
+              <button onclick="removePlannerEvent(${e.id})" class="text-red-500 hover:text-red-700">✕</button>
+            </div>
+          </div>
+        `).join('') : '<p class="text-gray-500">No upcoming events</p>';
+
+      document.getElementById('today-schedule').innerHTML = todayHtml;
+      document.getElementById('upcoming-schedule').innerHTML = upcomingHtml;
+    }
+
+    function removePlannerEvent(id) {
+      appState.plannerEvents = appState.plannerEvents.filter(e => e.id !== id);
+      updatePlannerDisplay();
+    }
+
+    function setPlannerReminders() {
+      alert('🔔 Reminders set! You\'ll get notifications for upcoming events.');
+    }
+
+    // Group Study
+    function createStudyGroup() {
+      const name = document.getElementById('group-name').value.trim();
+      const subject = document.getElementById('group-subject').value.trim();
+      const description = document.getElementById('group-description').value.trim();
+
+      if (!name || !subject) {
+        alert('Please fill in group name and subject!');
+        return;
+      }
+
+      const group = {
+        id: Date.now(),
+        name,
+        subject,
+        description,
+        members: ['You (Owner)'],
+        notes: [],
+        code: Math.random().toString(36).substring(7).toUpperCase()
+      };
+
+      appState.studyGroups.push(group);
+      appState.currentGroupId = group.id;
+
+      document.getElementById('group-name').value = '';
+      document.getElementById('group-subject').value = '';
+      document.getElementById('group-description').value = '';
+
+      updateGroupsList();
+      showGroupDetail(group.id);
+    }
+
+    function joinStudyGroup() {
+      const code = document.getElementById('group-code').value.trim().toUpperCase();
+      const group = appState.studyGroups.find(g => g.code === code);
+
+      if (!group) {
+        alert('Group code not found. Please check and try again.');
+        return;
+      }
+
+      if (group.members.includes('You')) {
+        alert('You are already a member of this group!');
+        return;
+      }
+
+      group.members.push('Friend ' + group.members.length);
+      document.getElementById('group-code').value = '';
+      updateGroupsList();
+      alert('Joined group successfully! 🎉');
+    }
+
+    function updateGroupsList() {
+      if (!appState.studyGroups.length) {
+        document.getElementById('groups-list').innerHTML = '<p class="text-gray-500">No groups yet. Create or join one!</p>';
+        return;
+      }
+
+      const groupsHtml = appState.studyGroups.map(g => `
+        <div class="group-card cursor-pointer" onclick="showGroupDetail(${g.id})">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <h4 class="font-bold text-gray-800">${g.name}</h4>
+              <p class="text-sm text-gray-600">📚 ${g.subject}</p>
+            </div>
+            <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Code: ${g.code}</span>
+          </div>
+          <p class="text-sm text-gray-600">${g.description}</p>
+          <p class="text-xs text-gray-500 mt-2">👥 ${g.members.length} member${g.members.length !== 1 ? 's' : ''}</p>
+        </div>
+      `).join('');
+
+      document.getElementById('groups-list').innerHTML = groupsHtml;
+    }
+
+    function showGroupDetail(groupId) {
+      const group = appState.studyGroups.find(g => g.id === groupId);
+      if (!group) return;
+
+      appState.currentGroupId = groupId;
+      document.getElementById('group-detail-name').textContent = `${group.name} (${group.subject})`;
+
+      const notesHtml = group.notes.length ?
+        group.notes.map((n) => `
+          <div class="bg-white rounded-lg p-3 border-l-4 border-blue-500">
+            <p class="font-semibold text-gray-800 mb-1">${n.author}</p>
+            <p class="text-gray-700">${n.content}</p>
+            <p class="text-xs text-gray-500 mt-1">${new Date(n.timestamp).toLocaleString()}</p>
+          </div>
+        `).join('') : '<p class="text-gray-500">No shared notes yet</p>';
+
+      const membersHtml = group.members.map(m => `<p class="text-gray-600 text-sm">👤 ${m}</p>`).join('');
+
+      document.getElementById('shared-notes').innerHTML = notesHtml;
+      document.getElementById('group-members').innerHTML = membersHtml;
+      document.getElementById('group-detail').classList.remove('hidden');
+    }
+
+    function shareGroupNote() {
+      const group = appState.studyGroups.find(g => g.id === appState.currentGroupId);
+      const content = document.getElementById('group-note-input').value.trim();
+
+      if (!content) {
+        alert('Please enter a note to share!');
+        return;
+      }
+
+      group.notes.push({
+        author: 'You',
+        content,
+        timestamp: new Date()
+      });
+
+      document.getElementById('group-note-input').value = '';
+      showGroupDetail(appState.currentGroupId);
+      alert('Note shared with the group! 📤');
+    }
+
+    function inviteGroupMembers() {
+      const group = appState.studyGroups.find(g => g.id === appState.currentGroupId);
+      alert(`📧 Share this code with your friends: ${group.code}`);
+    }
+
+    // Utility
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text.substring(0, 500));
+        utterance.rate = 0.9;
+        speechSynthesis.speak(utterance);
+      } else {
+        alert('Voice feature not supported in your browser');
+      }
+    }
+
+    function startQuiz(type) {
+      document.getElementById('quiz-input-area').classList.remove('hidden');
+      document.getElementById('flashcard-display').classList.add('hidden');
+    }
+
+    updatePlannerDisplay();
+    updateGroupsList();
+  </script>
+</body>
+</html>
